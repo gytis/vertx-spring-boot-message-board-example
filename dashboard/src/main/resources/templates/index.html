@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/css/bootstrap.css"/>
+
+    <title>Live messages dashboard</title>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-center">Live messages feed</h1>
+    <ul id="messages" class="list-group"></ul>
+</div>
+<script type="text/javascript">
+    var addMessage = function(message) {
+        var time = new Date(message.timestamp).toLocaleString();
+        var li = document.createElement('li');
+        li.className = 'list-group-item align-items-center';
+        li.innerHTML = `
+            <h5><span class="badge badge-secondary">${time}</span> ${message.sender}</h5>
+            <p>${message.text}</p>
+        `;
+
+        var messages = document.getElementById("messages");
+        messages.prepend(li);
+    }
+
+    var messagesEventSource = new EventSource("/messages");
+    messagesEventSource.onmessage = function(e) {
+        addMessage(JSON.parse(e.data));
+    };
+
+    closeMessagesEventSource = function(event) {
+        console.log(event);
+        messagesEventSource.close();
+    }
+
+    window.addEventListener("beforeunload", closeMessagesEventSource);
+
+</script>
+</body>
+</html>
